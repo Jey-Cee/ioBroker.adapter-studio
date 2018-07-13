@@ -1,0 +1,390 @@
+<html>
+<head>
+
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+    <link rel="stylesheet" type="text/css" href="materialize.min.css">
+
+    <script type="text/javascript" src="../../lib/js/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="../../lib/js/loStorage.js"></script>
+    <script type="text/javascript" src="../../lib/js/translate.js"></script>
+    <script type="text/javascript" src="words.js"></script>
+    <script type="text/javascript" src="ace/ace.js"  charset="utf-8"></script>
+
+    <script type="text/javascript" src="materialize.min.js"></script>
+    <script type="text/javascript" src="../../lib/js/selectID.js"></script>
+
+
+    <style type="text/css" media="screen">
+        #editor {
+            position: absolute;
+            top: 130px;
+            left: 20%;
+            height: 80%;
+            width: 79%;
+        }
+
+        .ace_editor div, .ace_editor span { font-size: 12px !important; }
+
+        .as-folder {font-weight: bold;}
+        .as-file {font-weight: normal;}
+
+    </style>
+
+</head>
+
+
+<body>
+<div class="m">
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s2"><a href="#newAdapter" class="black-text">New</a></li>
+                <li class="tab col s2"><a id="liEditor" href="#editorTab" class="black-text active">Editor</a></li>
+                <li class="tab col s2"><a id="liTools" href="#toolsTab" class="black-text active">Tools</a></li>
+            </ul>
+
+        </div>
+
+        <div id="savedModal" class="modal">
+            <div class="modal-content center-align">
+                <h3>File has been saved</h3>
+            </div>
+        </div>
+        <div id="waitModal" class="modal">
+            <div class="modal-content center-align">
+                <h3>Wait</h3>
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorModal" class="modal">
+            <div class="modal-content center-align">
+                <h3>Error: Please check the ioBroker log</h3>
+            </div>
+        </div>
+
+        <div id="npmLoginModal" class="modal">
+            <div class="modal-content center-align">
+                <h3>npm Login</h3>
+                <div class="input-field">
+                    <input id="npmUser" type="text">
+                    <label for="npmUser" >Username</label>
+                </div>
+                <div class="input-field">
+                    <input id="npmPassword" type="password">
+                    <label for="npmPassword" >Password</label>
+                </div>
+                <div class="input-field">
+                    <input id="npmEmail" type="text">
+                    <label for="npmEmail" >e-mail</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="npmLogin" href="#!" class="modal-close waves-effect waves-green btn-flat">Login</a>
+            </div>
+        </div>
+
+        <div id="gitLinkModal" class="modal">
+            <div class="modal-content center-align">
+                <div class="input-field">
+                    <input id="urlRepo" type="text">
+                    <label for="urlRepo" >URL to GitHub repository</label>
+                </div>
+            <div class="modal-footer">
+                <a id="gitLink" href="#!" class="modal-close waves-effect waves-green btn-flat">Checkout</a>
+            </div>
+        </div>
+            <div id="updateVersionModal" class="modal">
+                <div class="modal-content center-align">
+                    <div class="input-field col s3">
+                        <select>
+                            <option value="patch">Patch (Bug fixes)</option>
+                            <option value="minor">Minor Update (Functional changes)</option>
+                            <option value="major">Major Update (Breaking changes)</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <a id="newVersion" href="#!" class="modal-close waves-effect waves-green btn-flat">Update Version</a>
+                    </div>
+                </div>
+        </div>
+
+
+
+        <div id="newAdapter" class="cols s12">
+            <div class="row">
+
+            </div>
+            <div class="row">
+                <h5>General information</h5>
+                <div class="input-field col s3">
+                    <input id="adapter-name" type="text" class="validate">
+                    <label for="adapter-name" class="tooltipped" data-position="bottom" data-tooltip="Don't Use special Characters!">Adapter name</label>
+                </div>
+                <div class="input-field col s3">
+                    <input id="author-name" type="text" class="validate">
+                    <label for="author-name">Author name</label>
+                </div>
+                <div class="input-field col s3">
+                    <input id="author-email" type="email" class="validate">
+                    <label for="author-email">Author e-mail</label>
+                </div>
+                <div class="input-field col s10">
+                    <input id="keywords" type="text" class="validate">
+                    <label for="keywords" class="tooltipped" data-position="bottom" data-tooltip="Seperated each Keyword with a ','">Keywords</label>
+                </div>
+                <div class="input-field col s5">
+                    <select id="sLicense">
+                        <option value="MIT">MIT License</option>
+                        <option value="Apache 2.0">Apache 2.0</option>
+                        <option value="CC-BY">CC-BY</option>
+                        <option value="OFL-1.1">OFL-1.1</option>
+                        <option value="EPL">EPL</option>
+                        <option value="LGPL">LGPL</option>
+                        <option value="GPLv3">GPLv3</option>
+                        <option value="GPLv2">GPLv2</option>
+                        <option value="CC-BY-NC">CC-BY-NC</option>
+                        <option value="CC-BY-NC-SA">CC-BY-NC-SA</option>
+                    </select>
+                    <label class="tooltipped" data-position="bottom" data-tooltip="Choose the License under wich you will release your Adapter. <br> You have to check if your dependencies are allowing to use it with the choosen license. ">License</label>
+                </div>
+                <div class="input-field col s5">
+                    <select id="sType">
+                        <option value="general">General</option>
+                        <option value="hardware">Hardware</option>
+                        <option value="lighting">Lighting</option>
+                        <option value="energy">Energy</option>
+                        <option value="multimedia">Multimedia</option>
+                        <option value="household">Household</option>
+                        <option value="iot-systems">IoT Systems</option>
+                        <option value="communication">Communication</option>
+                        <option value="climate-control">Climate Control</option>
+                        <option value="weather">Weather</option>
+                        <option value="geoposition">Geoposition</option>
+                        <option value="messaging">Messaging</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="date-and-time">Date and Time</option>
+                        <option value="visualization">Visualization</option>
+                        <option value="utility">Utility</option>
+                        <option value="storage">Storage</option>
+                        <option value="visualization-icons">Icons</option>
+                        <option value="logic">Logic</option>
+                        <option value="garden">Garden</option>
+                        <option value="protocols">Protocols</option>
+                        <option value="network">Network</option>
+                        <option value="alarm">Alarm</option>
+                        <option value="misc-data">Misc-Data</option>
+                        <option value="visualization-widgets">Widgets</option>
+                    </select>
+                    <label>Type</label>
+                </div>
+            </div>
+
+            <div class="row">
+
+            </div>
+
+            <div class="row">
+                <h5>General Settings</h5>
+
+                <div class="input-field col s5">
+                    <select id="sMode">
+                        <option value="daemon">Daemon</option>
+                        <option value="schedule">Schedule</option>
+                        <option value="once">Once</option>
+                        <option value="subscribe">Subscribe</option>
+                        <option value="none">None</option>
+                    </select>
+                    <label>Mode</label>
+                </div>
+                <div class="input-field col s5">
+                    <select id="sLogLevel">
+                        <option value="info">Info</option>
+                        <option value="warn">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="debug">Debug</option>
+                        <option value="silly">Silly</option>
+                    </select>
+                    <label>Log Level</label>
+                </div>
+
+            </div>
+            <div class="row">
+                <div id="cron-input" class="input-field col s3 hide">
+                    <input id="cron" type="text" class="validate">
+                    <label for="cron" class="tooltipped" data-position="bottom" data-tooltip="Use Cron Syntax \n https://de.wikipedia.org/wiki/Cron">Cron</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s10">
+                    <input id="dependencies" type="text" class="validate">
+                    <label for="dependencies" class="tooltipped" data-position="bottom" data-tooltip="Use this format: PacketName ^1.0.0 <br> Seperate each packet with a ',' <br> Version identifier: version number only = must match exactly, ^ = compatible with Version, * = match any version <br>For more version identifier look at npmjs.com">Dependencies (npm packages)</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s3">
+                    <p>
+                        <label>
+                            <input id="cbEnabled" type="checkbox" checked="checked"/>
+                            <span class="tooltipped" data-position="bottom" data-tooltip="If checked, Adapter is enabled and starts directly after installation">Adapter Enabled</span>
+                        </label>
+                    </p>
+                    <p>
+                </div>
+                <div class="col s3">
+                    <p>
+                        <label>
+                            <input id="cbAdminV2" type="checkbox" />
+                            <span class="tooltipped" data-position="bottom" data-tooltip="index.html is also there and you have to fill it with content">Admin v2 Support</span>
+                        </label>
+                    </p>
+                    <p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h5>Expert Parameters <button id="ddExpert" class="btn-flat"><i id="ddIcon" class="small material-icons">arrow_drop_down</i></button></h5>
+                <div id="expert-settings" class="hide">
+                <div class="col s3">
+                    <p>
+                        <label>
+                            <input id="cbWidgets" type="checkbox" />
+                            <span class="tooltipped" data-position="bottom" data-tooltip="Folder 'widgets' is inside your Adapter folder and you have to put your Widget files there">Ship with Widgets</span>
+                        </label>
+                    </p>
+                    <p>
+                </div>
+                <div class="col s3">
+                    <p>
+                        <label>
+                            <input id="cbWWW" type="checkbox" />
+                            <span class="tooltipped" data-position="bottom" data-tooltip="Folder 'www' is inside your Adapter folder and you have to put your www files there">Ship with own Webpage</span>
+                        </label>
+                    </p>
+                    <p>
+                </div>
+                <div class="col s3">
+                    <p>
+                        <label>
+                            <input id="cbAdmTab" type="checkbox" />
+                            <span class="tooltipped" data-position="bottom" data-tooltip="Add tab_m.html & tab.js to folder 'admin' and also tab.html if you have selected Admin v2 support">Ship with own Admin Tab</span>
+                        </label>
+                    </p>
+                    <p>
+                </div>
+                <div class="col s3">
+                    <p>
+                        <label>
+                            <input id="cbMessageBox" type="checkbox" />
+                            <span class="tooltipped" data-position="bottom" data-tooltip="This allows your Adapter to receive messages directly from other Adapter">Allow 'sendTo'</span>
+                        </label>
+                    </p>
+                    <p>
+                </div>
+                <div class="row">
+                    <div class="input-field col s10">
+                        <input id="depAdapters" type="text" class="validate">
+                        <label for="depAdapters" class="tooltipped" data-position="bottom" data-tooltip="Use this format: AdapterName ^1.0.0 <br> Seperate each packet with a ',' <br> Version identifier: version number only = must match exactly, ^ = compatible with Version, * = match any version <br>For more version identifier look at npmjs.com">Dependencies (Adapter)</label>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <a id="btnCreate" class="waves-effect waves-light btn blue">Create</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="editorTab">
+            <div class="row">
+
+            </div>
+
+            <div class="row">
+            <div>
+                <a id="selectedAdapter" class='dropdown-trigger btn col s2 blue' href='#' data-target='chooseAdapter'>Select Adapter</a>
+
+                <ul id='chooseAdapter' class='dropdown-content'>
+                </ul>
+            </div>
+
+                <div class="col s1">
+
+                </div>
+
+                <div class="col s1">
+                    <button id="saveFile" class="waves-effect waves-light btn grey"><i class="material-icons">save</i></button>
+                </div>
+                <div class="col s1">
+                    <button id="uploadFiles" class="waves-effect waves-light btn grey tooltipped" data-position="bottom" data-tooltip="Upload files for Instance"><i class="material-icons">file_upload</i></button>
+                </div>
+                <div class="col s1">
+                    <button id="ssAdapter" class="waves-effect waves-light btn grey tooltipped" data-position="bottom" data-tooltip="Start/Stop Adapter"><i class="material-icons">play_arrow</i></button>
+                </div>
+                <div class="col s1">
+                    <button id="rsAdapter" class="waves-effect waves-light btn grey tooltipped" data-position="bottom" data-tooltip="Restart Adapter"><i class="material-icons">refresh</i></button>
+                </div>
+                <div class="col s1">
+                    <a id="publish" class='dropdown-trigger btn grey' href='#' data-target='publishTo'><i class="material-icons">cloud_upload</i></a>
+                    <ul id='publishTo' class='dropdown-content'>
+                        <li><a href="#!">npm</a></li>
+                        <li><a href="#!">github</a></li>
+                    </ul>
+                </div>
+                <div class="col s1">
+                    <button id="checkout" class="waves-effect waves-light btn grey tooltipped modal-trigger" href="#gitLinkModal" data-position="bottom" data-tooltip="Checkout from Github"><i class="material-icons">cloud_download</i></button>
+                </div>
+
+            <div class="col s10" id="editor">
+            </div>
+
+        </div>
+
+            <div class="row">
+                <div id="fTree" class="collection col s2">
+                </div>
+                <div class="col s5 center-align">
+                    <img id="imageViewer" class="hide" src=""/>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="toolsTab">
+            <div class="row">
+                <div class="col s1">
+                    <button id="updateVersion" class="waves-effect waves-light btn grey">Update Version</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+<script type="text/javascript" src="tab.js"></script>
+
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/tomorrow_night_bright");
+    editor.setOptions({
+        "selectionStyle": "line",
+        "highlightSelectedWord": true,
+        "autoScrollEditorIntoView": true
+    });
+    editor.session.setMode("ace/mode/javascript");
+    editor.session.mergeUndoDeltas = true;
+    //editor.renderer.setOption("fontSize", "16px");
+
+</script>
+</body>
+</html>

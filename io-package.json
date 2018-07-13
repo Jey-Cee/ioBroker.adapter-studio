@@ -1,0 +1,74 @@
+{
+    "common": {
+        "name": "adapter-studio",
+        "version": "0.1.0",
+        "news": {
+            "0.0.1": {
+                "en": "initial adapter",
+                "de": "Initiale Version",
+                "ru": "Первоначальный адаптер",
+                "pt": "Versão inicial",
+                "fr": "Version initiale",
+                "nl": "Eerste release"
+            }
+        },
+		"title": "Javascript/Node.js based adapter-studio adapter",
+        "titleLang": {
+            "en": "Javascript/Node.js based adapter-studio adapter",
+            "de": "Javascript / Node.js basierte Vorlagenadapter",
+            "ru": "Адаптер шаблонов на основе Javascript / Node.js",
+            "pt": "Adaptador de modelo baseado em Javascript / Node.js",
+            "nl": "Javascript / Node.js gebaseerde sjabloonadapter",
+            "fr": "Javascript / Node.js basé adaptateur de modèle",
+            "it": "Adattatore modello basato su Javascript / Node.js",
+            "es": "Adaptador de plantilla basado en JavaScript / Node.js"
+        },
+        "desc": {
+            "en": "ioBroker adapter-studio Adapter",
+            "de": "ioBroker Adapter-studio Adapter",
+            "ru": "ioBroker Adapter_studio драйвер как образец",
+            "pt": "Modelo de adaptador para o ioBroker",
+            "fr": "ioBroker adaptateur modèle",
+            "nl": "ioBroker Adapter_studio Adapter",
+            "it": "Adattatore modello ioBroker",
+            "es": "Adaptador de plantilla ioBroker"
+        },
+        "authors": [
+            "Jey Cee <jey-cee@live.com>"
+        ],
+        "docs": {
+            "en": "docs/en/admin.md",
+            "ru": "docs/ru/admin.md",
+            "de": "docs/de/admin.md",
+            "es": "docs/es/admin.md",
+            "it": "docs/it/admin.md",
+            "fr": "docs/fr/admin.md",
+            "nl": "docs/nl/admin.md",
+            "pt": "docs/pt/admin.md"
+        },
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "icon": "adapter-studio.png",
+        "materialize": true,
+        "materializeTab": true,
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.adapter_studio/master/admin/adapter-studio.png",
+        "keywords": ["adapter_studio", "vis", "GUI", "graphical", "scada"],
+        "readme": "https://github.com/jey-cee/ioBroker.adapter_studio/blob/master/README.md",
+        "loglevel": "info",
+        "type": "general",
+        "adminTab": {
+            "name": "Adapter Studio"
+        },
+        "messagebox":               true,
+        "subscribe":                "messagebox"
+
+    },
+    "native": {
+        "ghuser": "",
+        "ghpw": ""
+    },
+    "objects": [
+
+    ]
+}
