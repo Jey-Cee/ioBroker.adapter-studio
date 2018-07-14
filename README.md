@@ -6,7 +6,7 @@ The AIM of this Adapter is to create simple, fast and standardized new Adapter f
 
 Manual:
 
-1. Install the Adapter-Studio via custom URL
+1. Install the Adapter-Studio via custom URL and add an instance
 
 2. Make a plan for your adapter:
        - Which type is it? (General, Hardware, Lighting, Energy,...)
