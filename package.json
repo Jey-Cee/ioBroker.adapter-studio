@@ -13,7 +13,7 @@
     }
   ],
   "homepage": "https://github.com/ioBroker/ioBroker.adapter-studio",
-  "license": "MIT",
+  "license": "CC-BY-NC-SA",
   "keywords": [
     "ioBroker",
     "adapter_studio",

@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "adapter-studio",
-        "version": "0.1.0",
+        "version": "0.6.0",
         "news": {
+            "0.6.0": {
+                "en": "public release",
+                "de": "öffentliche Freigabe",
+                "ru": "публичный выпуск",
+                "pt": "lançamento público",
+                "nl": "openbare vrijgave",
+                "fr": "sortie publique",
+                "it": "rilascio pubblico",
+                "es": "lanzamiento publico",
+                "pl": "publiczne wydanie"
+            },
             "0.0.1": {
                 "en": "initial adapter",
                 "de": "Initiale Version",
