@@ -6,7 +6,7 @@ The AIM of this Adapter is to create simple, fast and standardized new Adapter f
 
 Manual:
 
-1. Install the Adapter-Studio via custom URL and add an instantce
+1. Install the Adapter-Studio via custom URL and add an instance
 
 2. Make a plan for your adapter:
        - Which type is it? (General, Hardware, Lighting, Energy,...)
@@ -22,7 +22,7 @@ Manual:
  4. Click on "Create" and wait a few minutes until the adapter template will be downloaded and customized for you.
 
  5. Start programming your adapter, with your favorite Editor or with the Built in Editor.
-
+ 
 ## Changelog
 
 ### 0.1.0
