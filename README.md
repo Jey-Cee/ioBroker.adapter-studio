@@ -25,6 +25,13 @@ Manual:
  
 ## Changelog
 
+### 0.7.0
+* Small Bug Fixes
+*  Added Update Version
+*  Move "Publish to" to tools tab
+*  Move "Checkout..." to tools tab
+
+
 ### 0.1.0
 * (Jey Cee) initial release
 

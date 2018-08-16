@@ -8,6 +8,9 @@ const os = require('os');
 const fs = require('fs');
 const request = require('request');
 
+const jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+
 let plattform = os.platform();
 
 
@@ -126,6 +129,12 @@ adapter.on('message', (obj) => {
                     if (obj.callback) adapter.sendTo(obj.from, obj.command, res, obj.callback);
                 });
             }
+
+            if(obj.message.command === 'updateVersion'){
+                updateVersion(obj.message.typeOfUpdate, obj.message.changes, obj.message.adapterName, (res) => {
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, res, obj.callback);
+                });
+            }
         }
 
     }
@@ -145,7 +154,6 @@ adapter.on('ready', () => {
 function main() {
     adapter.log.info(plattform);
     adapter.log.info(__dirname);
-    createNewGHRepo('test', ()=>{});
 }
 
 let ready = true;
@@ -264,7 +272,7 @@ function createAdapter(data, callback){
             json.common.type = data.type;
             json.common.messagebox = data.messagebox;
             if(data.tab === true){
-                json.common.materialize = true;
+                json.common.materializeTab = true;
                 json.common.adminTab =  {"name": newName};
             }
             //Keywords
@@ -353,7 +361,7 @@ function createAdapter(data, callback){
                     }else{
                         adapter.log.info(`rename information: ${email}, ${author}`);
                         rename(path, newName, email, author, () => {
-                            let cmd = 'git add .';
+                            let cmd = 'git init & git add .';
                             const child = exec(cmd, {cwd: path});
                             child.stderr.pipe(process.stdout);
                             child.on('exit', (code) => {
@@ -649,7 +657,7 @@ function getRunningState(adapterName, callback){
 
 function npmPublish(adapterName, callback){
     let odir = __dirname;
-    let path = odir.replace('iobroker.adapter-studio', `${adapterName}`);
+    let path = odir.replace('iobroker.adapter-studio', `${s}${adapterName}`);
 
     let cmd = `npm publish`;
     const child = exec(cmd, {cwd: path});
@@ -718,34 +726,147 @@ function npmAdduser(user, password, email, callback){
 
 
 function createNewGHRepo(adapterName, callback){
-    let user = adapter.config.ghuser;
-    let pw = adapter.config.ghpw;
+    let token = adapter.config.ghtoken;
+
+    let content = JSON.stringify({"scope": "repo", "name": adapterName, "has_wiki": "false"});
 
     let options = {
-        url: `https://api.github.com/user/repos`,
+        url: 'https://api.github.com/user/repos',
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': `${user}`,
-            'Authorization': 'Basic ' + new Buffer(user + ':' + pw).toString('base64')
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json; charset=utf-8',
+            'User-Agent': 'Adapter Studio (ioBroker)',
+            'Content-Length': content.length,
+            'Authorization': `token ${token}`
         }
     };
 
+
+
     let req = request(options, function (error, res, body){
-        adapter.log.info('STATUS: ' + res.statusCode);
-        if(res.statusCode === 403){
-            callback('Forbidden');
-        }else if(res.statusCode === 200){
-            let b = JSON.parse(body);
-            adapter.log.info(JSON.stringify(b));
-            callback('Done');
+        if(error){
+            callback('Error');
+            adapter.log.error(error);
         }
+        adapter.log.info('STATUS: ' + res.statusCode);
+        switch(res.statusCode){
+            case 422:
+                callback('Error');
+                adapter.log.info('Repo already exists on this account: ' + body);
+                adapter.log.info('options: ' + JSON.stringify(options));
+                break;
+            case 404:
+                callback('Error');
+                adapter.log.info('Create repo not found: ' + body);
+                adapter.log.info('options: ' + JSON.stringify(options));
+                break;
+            case 403:
+                callback('Error');
+                adapter.log.info('Create repo forbidden: ' + body);
+                break;
+            case 401:
+                callback('Error');
+                adapter.log.info('Unauthorized: ' + body);
+                break;
+            case 400:
+                callback('Error');
+                adapter.log.info('Bad request: ' + body);
+                break;
+            case 201:
+                commitToGH(adapterName, 'Initial commit (by ioBroker Adapter Studio)', true, callback);
+                adapter.log.info('Repository successfully created');
+                break;
+            case 200:
+                commitToGH(adapterName, 'Initial commit (by ioBroker Adapter Studio)', true, callback);
+                adapter.log.info('Repository successfully created');
+                break;
+        }
+
     });
 
-    let content = `{"name": adapterName, "has_wiki": false, "auto_init": false}`;
 
     req.write(content);
 
+}
+
+function commitToGH(adapterName, commitMessage, initial, callback){
+    let user = adapter.config.ghuser;
+    let email = adapter.config.ghemail;
+    let odir = __dirname;
+    let path = odir.replace(`${s}iobroker.adapter-studio`, `${s}${adapterName}`);
+
+    let cmd = `git config --global user.name "${user}" & git config --global user.email "${email}" & git add -u & git commit -m "${commitMessage}"`;
+    let child = exec(cmd, {cwd: path});
+
+    child.stderr.pipe(process.stdout);
+    adapter.log.info('adapterName: ' + adapterName + ' Commit message: ' + commitMessage + ' Initial: ' + initial + ' User: ' + user + ' Path: ' + path);
+    child.on('exit', (code) => {
+        adapter.log.info(`Exit code commitToGH: ${code}`);
+        if (code === 0) {
+            if(initial === true) {
+
+                cmd = `git remote add origin https://github.com/${user}/${adapterName}.git`;
+                child = exec(cmd, {cwd: path});
+
+                child.stderr.pipe(process.stdout);
+                child.on('exit', (code) => {
+                    adapter.log.info(`Exit code commitToGH: ${code}`);
+                    if (code === 0) {
+                        cmd = `git push -u origin master --force`;
+                        const child = exec(cmd, {cwd: path});
+                        child.stderr.pipe(process.stdout);
+                        child.on('exit', (code) => {
+                            adapter.log.info(`Exit code commitToGH: ${code}`);
+                            if (code === 0) {
+                                callback('Done');
+                            } else if (code > 0) {
+                                callback('Error')
+                            }
+                        });
+                    } else if (code > 0) {
+                        callback('Error')
+                    }
+                });
+
+                child.stderr.on('data', (data) => {
+                    adapter.log.info('stderr: ' + data.toString());
+                });
+                child.stdout.on('data', (data) => {
+                    adapter.log.info('stdout: ' + data.toString());
+                });
+            }else if (initial === false){
+                cmd = `git push - u origin master`;
+                child = exec(cmd, {cwd: path});
+
+                child.stderr.pipe(process.stdout);
+                child.on('exit', (code) => {
+                    adapter.log.info(`Exit code commitToGH: ${code}`);
+                    if (code === 0) {
+                        callback('Done');
+                    } else if (code > 0) {
+                        callback('Error')
+                    }
+                });
+
+                child.stderr.on('data', (data) => {
+                    adapter.log.info('stderr: ' + data.toString());
+                });
+                child.stdout.on('data', (data) => {
+                    adapter.log.info('stdout: ' + data.toString());
+                });
+            }
+        } else if (code > 0) {
+            callback('Error');
+        }
+    });
+
+    child.stderr.on('data', (data) => {
+        adapter.log.info('stderr: ' + data.toString());
+    });
+    child.stdout.on('data', (data) => {
+        adapter.log.info('stdout: ' + data.toString());
+    });
 }
 
 function checkoutGithub(link, callback){
@@ -771,5 +892,127 @@ function checkoutGithub(link, callback){
     child.stdout.on('data', (data) => {
         adapter.log.info('stdout: ' + data.toString());
     });
+
+}
+
+function updateVersion(typeOfUpdate, changes, adapterName, callback){
+    let newVersion;
+
+    let odir = __dirname;
+    let path = odir.replace('iobroker.adapter-studio', `${s}${adapterName}`);
+
+    fs.readFile(`${path}${s}package.json`, (err, output) => {
+        let json = JSON.parse(output);
+        if (err) throw err;
+
+        let oldVersion = json.version;
+        let arrVersion = oldVersion.split('.');
+        let patch;
+        let minor;
+        let major;
+
+        switch(typeOfUpdate){
+            case 'patch':
+                major = arrVersion[0];
+                minor = arrVersion[1];
+                patch = parseInt(arrVersion[2]) + 1;
+                break;
+            case 'minor':
+                major = arrVersion[0];
+                minor = parseInt(arrVersion[1]) + 1;
+                patch = 0;
+                break;
+            case 'major':
+                major = parseInt(arrVersion[0]) + 1;
+                minor = 0;
+                patch = 0;
+                break;
+        }
+
+        newVersion = `${major}.${minor}.${patch}`;
+
+        json.version = newVersion;
+
+        fs.writeFile(`${path}${s}package.json`, JSON.stringify(json, null, 4), (err) => {
+            if (err) throw err;
+        });
+
+        fs.readFile(`${path}${s}io-package.json`, (err, output) => {
+            let json = JSON.parse(output);
+            if (err) throw err;
+
+            json.common.version = newVersion;
+
+            translateGoogleWeb(changes, (result) => {
+                adapter.log.info('result :' + JSON.stringify(result));
+                json.common.news[newVersion] = result;
+
+                fs.writeFile(`${path}${s}io-package.json`, JSON.stringify(json, null, 4), (err) => {
+                    if (err) throw err;
+                });
+            });
+
+
+        });
+
+        fs.readFile(`${path}${s}README.md`, 'utf8', (err, output) => {
+            if (err) throw err;
+
+            let n = output.indexOf('## Changelog');
+            let arrChanges = changes.split(';');
+            let addText = `\r\n\r\n### ${newVersion}\r\n`;
+            for(let obj in arrChanges){
+                    if(arrChanges[obj] != ''){
+                        addText += `* ${arrChanges[obj]}\r\n`
+                    }
+
+
+            }
+            let newOutput = [output.slice(0, n+12), addText, output.slice(n+12)].join('');
+
+            fs.writeFile(`${path}${s}README.md`, newOutput, (err) => {
+                if (err) throw err;
+            });
+
+        });
+    });
+}
+
+function translateGoogleWeb(text, callback){
+    let langs = ['en', 'de', 'ru', 'pt', 'nl', 'fr', 'it', 'es', 'pl'];
+    let json = {
+        "en": "",
+        "de": "",
+        "ru": "",
+        "pt": "",
+        "nl": "",
+        "fr": "",
+        "it": "",
+        "es": "",
+        "pl": ""
+    };
+
+    for(let l in langs){
+        request(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${langs[l]}&dt=t&q=` + encodeURI(text), (error, res, body) =>{
+            adapter.log.info('STATUS: ' + res.statusCode);
+            if(res.statusCode === 403){
+                adapter.log.info('Access forbidden google translate');
+            }else if(res.statusCode === 200){
+                let result = JSON.parse(body);
+                let noTrans = body[0].length;
+                let text = '';
+
+                for(let i = 0; i < noTrans; i++){
+                    text += result[0][i][0] + '\n';
+                }
+                text = text.replace(/;/g, '');
+                json[langs[l]] = text;
+
+                callback(json);
+            }
+        });
+    }
+
+
 
 }

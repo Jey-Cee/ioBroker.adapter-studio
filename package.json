@@ -1,41 +1,44 @@
 {
-  "name": "iobroker.adapter-studio",
-  "version": "0.6.1",
-  "description": "ioBroker adapter-studio Adapter",
-  "author": {
-    "name": "Jey Cee",
-    "email": "jey-cee@live.com"
-  },
-  "contributors": [
-    {
-      "name": "Jey Cee",
-      "email": "jey-cee@live.com"
-    }
-  ],
-  "homepage": "https://github.com/ioBroker/ioBroker.adapter-studio",
-  "license": "CC-BY-NC-SA",
-  "keywords": [
-    "ioBroker",
-    "adapter_studio",
-    "Smart Home",
-    "home automation"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ioBroker/ioBroker.adapter-studio"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "mocha": "^4.1.0",
-    "chai": "^4.1.2"
-  },
-  "main": "main.js",
-  "scripts": {
-    "test": "node node_modules/mocha/bin/mocha --exit"
-  },
-  "bugs": {
-    "url": "https://github.com/ioBroker/ioBroker.adapter-studio/issues"
-  },
-  "readmeFilename": "README.md"
+    "name": "iobroker.adapter-studio",
+    "version": "0.7.0",
+    "description": "ioBroker adapter-studio Adapter",
+    "author": {
+        "name": "Jey Cee",
+        "email": "jey-cee@live.com"
+    },
+    "contributors": [
+        {
+            "name": "Jey Cee",
+            "email": "jey-cee@live.com"
+        }
+    ],
+    "homepage": "https://github.com/ioBroker/ioBroker.adapter-studio",
+    "license": "CC-BY-NC-SA",
+    "keywords": [
+        "ioBroker",
+        "adapter_studio",
+        "Smart Home",
+        "home automation"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ioBroker/ioBroker.adapter-studio"
+    },
+    "dependencies": {
+        "jsdom": "^11.12.0",
+        "request": "^2.87.0"
+    },
+    "devDependencies": {
+        "gulp": "^3.9.1",
+        "mocha": "^4.1.0",
+        "chai": "^4.1.2"
+    },
+    "main": "main.js",
+    "scripts": {
+        "test": "node node_modules/mocha/bin/mocha --exit"
+    },
+    "bugs": {
+        "url": "https://github.com/ioBroker/ioBroker.adapter-studio/issues"
+    },
+    "readmeFilename": "README.md"
 }

@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "adapter-studio",
-        "version": "0.6.1",
+        "version": "0.7.0",
         "news": {
             "0.6.0": {
                 "en": "public release",
@@ -21,9 +21,20 @@
                 "pt": "Versão inicial",
                 "fr": "Version initiale",
                 "nl": "Eerste release"
+            },
+            "0.7.0": {
+                "en": "Small Bug Fixes Added Update Version Move \"Publish to\" to tools tab Move \"Checkout...\" to tools tab\n",
+                "de": "Kleine Bugfixes \n",
+                "ru": "Небольшие исправления ошибок \n",
+                "pt": "Pequenas correções de bugs \n",
+                "nl": "Kleine bugfixes \n",
+                "fr": "Petites corrections de bugs \n",
+                "it": "Correzioni di piccoli bug \n",
+                "es": "Pequeñas correcciones de errores \n",
+                "pl": "Małe poprawki błędów \n"
             }
         },
-		"title": "Javascript/Node.js based adapter-studio adapter",
+        "title": "Javascript/Node.js based adapter-studio adapter",
         "titleLang": {
             "en": "Javascript/Node.js based adapter-studio adapter",
             "de": "Javascript / Node.js basierte Vorlagenadapter",
@@ -64,22 +75,26 @@
         "materializeTab": true,
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.adapter_studio/master/admin/adapter-studio.png",
-        "keywords": ["adapter_studio", "vis", "GUI", "graphical", "scada"],
+        "keywords": [
+            "adapter_studio",
+            "vis",
+            "GUI",
+            "graphical",
+            "scada"
+        ],
         "readme": "https://github.com/jey-cee/ioBroker.adapter_studio/blob/master/README.md",
         "loglevel": "info",
         "type": "general",
         "adminTab": {
             "name": "Adapter Studio"
         },
-        "messagebox":               true,
-        "subscribe":                "messagebox"
-
+        "messagebox": true,
+        "subscribe": "messagebox"
     },
     "native": {
-        "ghuser": "",
-        "ghpw": ""
+        "ghtoken": "facab43891ef7a96ac95b79e0a39c66fb3f946f8",
+        "ghuser": "Jey-Cee",
+        "ghemail": "jey-cee@live.com"
     },
-    "objects": [
-
-    ]
+    "objects": []
 }

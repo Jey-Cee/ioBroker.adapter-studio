@@ -51,6 +51,11 @@
                 <h3>File has been saved</h3>
             </div>
         </div>
+        <div id="doneModal" class="modal">
+            <div class="modal-content center-align">
+                <h3>Done</h3>
+            </div>
+        </div>
         <div id="waitModal" class="modal">
             <div class="modal-content center-align">
                 <h3>Wait</h3>
@@ -100,12 +105,16 @@
         </div>
             <div id="updateVersionModal" class="modal">
                 <div class="modal-content center-align">
-                    <div class="input-field col s3">
-                        <select>
+                    <div class="input-field">
+                        <select id="typeOfUpdate">
                             <option value="patch">Patch (Bug fixes)</option>
                             <option value="minor">Minor Update (Functional changes)</option>
                             <option value="major">Major Update (Breaking changes)</option>
                         </select>
+                    </div>
+                    <div class="input-field">
+                        <input id="versionChanges" type="text">
+                        <label for="versionChanges" class="tooltipped" data-position="bottom" data-tooltip="Seperate each point by ; (semikolon)">Whats are the changes?</label>
                     </div>
                     <div class="modal-footer">
                         <a id="newVersion" href="#!" class="modal-close waves-effect waves-green btn-flat">Update Version</a>
@@ -321,7 +330,7 @@
                 </div>
 
                 <div class="col s1">
-                    <button id="saveFile" class="waves-effect waves-light btn grey"><i class="material-icons">save</i></button>
+                    <button id="saveFile" class="waves-effect waves-light btn grey tooltipped" data-position="bottom" data-tooltip="Save file"><i class="material-icons">save</i></button>
                 </div>
                 <div class="col s1">
                     <button id="uploadFiles" class="waves-effect waves-light btn grey tooltipped" data-position="bottom" data-tooltip="Upload files for Instance"><i class="material-icons">file_upload</i></button>
@@ -332,16 +341,7 @@
                 <div class="col s1">
                     <button id="rsAdapter" class="waves-effect waves-light btn grey tooltipped" data-position="bottom" data-tooltip="Restart Adapter"><i class="material-icons">refresh</i></button>
                 </div>
-                <div class="col s1">
-                    <a id="publish" class='dropdown-trigger btn grey' href='#' data-target='publishTo'><i class="material-icons">cloud_upload</i></a>
-                    <ul id='publishTo' class='dropdown-content'>
-                        <li><a href="#!">npm</a></li>
-                        <li><a href="#!">github</a></li>
-                    </ul>
-                </div>
-                <div class="col s1">
-                    <button id="checkout" class="waves-effect waves-light btn grey tooltipped modal-trigger" href="#gitLinkModal" data-position="bottom" data-tooltip="Checkout from Github"><i class="material-icons">cloud_download</i></button>
-                </div>
+
 
             <div class="col s10" id="editor">
             </div>
@@ -359,10 +359,23 @@
             </div>
         </div>
 
-        <div class="toolsTab">
+        <div id="toolsTab">
             <div class="row">
-                <div class="col s1">
-                    <button id="updateVersion" class="waves-effect waves-light btn grey">Update Version</button>
+
+            </div>
+            <div class="col s1">
+                <a id="publish" class='dropdown-trigger btn grey tooltipped' href='#' data-position="bottom" data-tooltip="Publish to npm or Github" data-target='publishTo'><i class="material-icons">cloud_upload</i></a>
+                <ul id='publishTo' class='dropdown-content'>
+                    <li><a href="#!">npm</a></li>
+                    <li><a href="#!">github</a></li>
+                </ul>
+            </div>
+            <div class="col s1">
+                <button id="checkout" class="waves-effect waves-light btn grey tooltipped modal-trigger" href="#gitLinkModal" data-position="bottom" data-tooltip="Checkout from Github"><i class="material-icons">cloud_download</i></button>
+            </div>
+            <div class="row">
+                <div class="col s2">
+                    <button id="updateVersion" class="waves-effect waves-light btn grey tooltipped modal-trigger" href="#updateVersionModal" data-position="bottom" data-tooltip="Update version number and changelog at all positions">Update Version</button>
                 </div>
             </div>
         </div>

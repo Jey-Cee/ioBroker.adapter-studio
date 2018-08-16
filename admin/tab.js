@@ -338,7 +338,7 @@ function Core(main) {
         })
     });
 
-    $('#gitLink').click(function(){
+    $('#gitLink').click(() => {
         let link = $('#urlRepo').val();
         let iWaitModal = M.Modal.getInstance(document.getElementById('waitModal'));
         let iErrorModal = M.Modal.getInstance(document.getElementById('errorModal'));
@@ -354,6 +354,24 @@ function Core(main) {
         })
 
     });
+
+    $('#newVersion').click(() => {
+        let typeOfUpdate = $('#typeOfUpdate').val();
+        let changes = $('#versionChanges').val();
+        let iDoneModal = M.Modal.getInstance(document.getElementById('doneModal'));
+
+        main.socket.emit('sendTo', 'adapter-studio.0', 'send', {"command": `updateVersion`, "typeOfUpdate": `${typeOfUpdate}`, "changes": `${changes}`, "adapterName": `${actualAdapter}`}, (result) => {
+            if(result === 'Error'){
+                iErrorModal.open();
+            }else if(result === 'Done'){
+                iDoneModal.open();
+                setTimeout(() => {
+                    iDoneModal.close();
+                }, 5000)
+            }
+
+        })
+    })
 }
 
 function loadToEditor(fileType, content, callback){
