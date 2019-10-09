@@ -1,3 +1,6 @@
+# _Development stopped_
+
+
 ![Logo](admin/adapter_studio.png)
 # ioBroker.adapter_studio
 =================
